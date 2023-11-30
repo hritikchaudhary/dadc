@@ -1,41 +1,16 @@
-package com.metakeep.dadc.model;
+package com.metakeep.dadc.dto;
 
-import jakarta.persistence.*;
 import org.springframework.http.HttpStatus;
 
 import java.util.Date;
 
-@Entity
-@Table(name = "analytics")
-public class Analytics {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
-    @Column(name = "timestamp")
+public class AnalyticsDTO {
     private Date createdAt;
-    @Column(name = "user_id")
     private String userID;
-
-    @Column(name = "status")
     private HttpStatus status;
-
-    @Column(name = "error_message")
     private String errorMessage;
-
-    @Column(name = "request")
     private String request;
-
-    @Column(name = "response")
     private String response;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Date getCreatedAt() {
         return createdAt;
@@ -84,5 +59,4 @@ public class Analytics {
     public void setResponse(String response) {
         this.response = response;
     }
-
 }
