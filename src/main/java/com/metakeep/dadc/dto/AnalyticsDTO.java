@@ -1,13 +1,11 @@
 package com.metakeep.dadc.dto;
 
-import org.springframework.http.HttpStatus;
-
 import java.util.Date;
 
 public class AnalyticsDTO {
     private Date createdAt;
     private String userID;
-    private HttpStatus status;
+    private String status;
     private String errorMessage;
     private String request;
     private String response;
@@ -28,11 +26,11 @@ public class AnalyticsDTO {
         this.userID = userID;
     }
 
-    public HttpStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(HttpStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

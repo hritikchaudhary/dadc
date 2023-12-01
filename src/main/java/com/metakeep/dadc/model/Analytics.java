@@ -1,7 +1,6 @@
 package com.metakeep.dadc.model;
 
 import jakarta.persistence.*;
-import org.springframework.http.HttpStatus;
 
 import java.util.Date;
 
@@ -18,7 +17,7 @@ public class Analytics {
     private String userID;
 
     @Column(name = "status")
-    private HttpStatus status;
+    private String status;
 
     @Column(name = "error_message")
     private String errorMessage;
@@ -53,11 +52,11 @@ public class Analytics {
         this.userID = userID;
     }
 
-    public HttpStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(HttpStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

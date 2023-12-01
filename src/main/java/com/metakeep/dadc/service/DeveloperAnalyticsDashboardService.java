@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -31,7 +33,7 @@ public class DeveloperAnalyticsDashboardService {
             analytics.setErrorMessage(error);
             analytics.setCreatedAt(new Date());
             analytics.setResponse(error);
-            analytics.setStatus(HttpStatus.BAD_REQUEST);
+            analytics.setStatus("Failure");
             analyticsRepository.save(analytics);
             return error;
         }
@@ -40,13 +42,24 @@ public class DeveloperAnalyticsDashboardService {
         analytics.setUserID(userID);
         analytics.setRequest(userID);
         analytics.setResponse(response);
-        analytics.setStatus(HttpStatus.OK);
+        analytics.setStatus("Success");
         analyticsRepository.save(analytics);
         return response;
     }
 
-    public AnalyticsResponse getStats(Pageable pageable) {
-        Page<Analytics> analytics = analyticsRepository.findAll(pageable);
+    public AnalyticsResponse getStats(Pageable pageable, LocalDate startDate, LocalDate endDate) {
+        Page<Analytics> analytics;
+
+        if (endDate != null && startDate == null) {
+            analytics = analyticsRepository.findByCreatedAtBefore(endDate.atTime(23, 59, 59, 999999999), pageable);
+        } else if (startDate != null && endDate != null) {
+            analytics = analyticsRepository.findByCreatedAtBetween(startDate.atStartOfDay(), endDate.atTime(23, 59, 59, 999999999), pageable);
+        } else if (startDate != null) {
+            LocalDateTime now = LocalDateTime.now();
+            analytics = analyticsRepository.findByCreatedAtBetween(startDate.atStartOfDay(), now, pageable);
+        } else {
+            analytics = analyticsRepository.findAll(pageable);
+        }
         List<AnalyticsDTO> analyticsDTO = new ArrayList<>();
         long totalFailures = 0;
         for (Analytics item : analytics) {
@@ -64,7 +77,7 @@ public class DeveloperAnalyticsDashboardService {
         }
         AnalyticsResponse response = new AnalyticsResponse();
         response.setAnalyticsDTOList(analyticsDTO);
-        response.setTotalResults(analyticsDTO.size());
+        response.setTotalResults(analyticsRepository.count());
         response.setUniqueUsers(analyticsRepository.countDistinctUserIds());
         response.setTotalFailures(totalFailures);
         response.setPageNumber(analytics.getNumber());
