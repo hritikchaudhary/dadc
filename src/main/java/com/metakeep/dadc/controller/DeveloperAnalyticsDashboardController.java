@@ -1,5 +1,6 @@
 package com.metakeep.dadc.controller;
 
+import com.metakeep.dadc.response.AnalyticsCountResponse;
 import com.metakeep.dadc.response.AnalyticsResponse;
 import com.metakeep.dadc.service.DeveloperAnalyticsDashboardService;
 import org.springframework.data.domain.PageRequest;
@@ -38,5 +39,11 @@ public class DeveloperAnalyticsDashboardController {
             @RequestParam(required = false) LocalDate endDate) {
         Pageable pageable = PageRequest.of(page, size);
         return this.developerAnalyticsDashboardService.getStats(pageable, startDate, endDate);
+    }
+
+    @GetMapping("/statsByDate")
+    public AnalyticsCountResponse getStats(@RequestParam(required = false) LocalDate startDate,
+                                           @RequestParam(required = false) LocalDate endDate) {
+        return this.developerAnalyticsDashboardService.getStatsByDate(startDate, endDate);
     }
 }
