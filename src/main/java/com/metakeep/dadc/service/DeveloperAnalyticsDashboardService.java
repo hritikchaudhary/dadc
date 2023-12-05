@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -40,14 +39,14 @@ public class DeveloperAnalyticsDashboardService {
         if (userID == null || userID.isEmpty()) {
             String error = "Please provide User ID";
             analytics.setErrorMessage(error);
-            analytics.setCreatedAt(new Date());
+            analytics.setCreatedAt(creatDate);
             analytics.setResponse(error);
             analytics.setStatus("Failure");
             analyticsRepository.save(analytics);
             return error;
         }
         String response = "Hello World!";
-        analytics.setCreatedAt(new Date());
+        analytics.setCreatedAt(creatDate);
         analytics.setUserID(userID);
         analytics.setRequest(userID);
         analytics.setResponse(response);

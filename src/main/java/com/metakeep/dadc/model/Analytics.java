@@ -2,7 +2,7 @@ package com.metakeep.dadc.model;
 
 import jakarta.persistence.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "analytics")
@@ -12,7 +12,7 @@ public class Analytics {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
     @Column(name = "timestamp")
-    private Date createdAt;
+    private LocalDateTime createdAt;
     @Column(name = "user_id")
     private String userID;
 
@@ -36,11 +36,11 @@ public class Analytics {
         this.id = id;
     }
 
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 

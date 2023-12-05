@@ -1,20 +1,20 @@
 package com.metakeep.dadc.dto;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class AnalyticsDTO {
-    private Date createdAt;
+    private LocalDateTime createdAt;
     private String userID;
     private String status;
     private String errorMessage;
     private String request;
     private String response;
 
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 

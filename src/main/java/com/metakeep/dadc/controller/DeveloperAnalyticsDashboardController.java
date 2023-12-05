@@ -5,6 +5,7 @@ import com.metakeep.dadc.response.AnalyticsResponse;
 import com.metakeep.dadc.service.DeveloperAnalyticsDashboardService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,8 +38,14 @@ public class DeveloperAnalyticsDashboardController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) LocalDate startDate,
-            @RequestParam(required = false) LocalDate endDate) {
-        Pageable pageable = PageRequest.of(page, size);
+            @RequestParam(required = false) LocalDate endDate,
+            @RequestParam(required = false) String sortColumn,
+            @RequestParam(defaultValue = "desc") String sortOrder) {
+
+        Sort.Direction direction = sortOrder.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort sort = Sort.by(direction, sortColumn != null ? sortColumn : "createdAt");
+
+        Pageable pageable = PageRequest.of(page, size, sort);
         return this.developerAnalyticsDashboardService.getStats(pageable, startDate, endDate);
     }
 
