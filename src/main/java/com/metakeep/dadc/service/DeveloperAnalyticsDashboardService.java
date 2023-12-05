@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,9 +29,15 @@ public class DeveloperAnalyticsDashboardService {
         this.analyticsRepository = analyticsRepository;
     }
 
-    public String helloService(String userID) {
+    public String helloService(String userID, LocalDate createdAt) {
+        LocalDateTime creatDate;
+        if (createdAt == null) {
+            creatDate = LocalDateTime.now();
+        } else {
+            creatDate = createdAt.atTime(LocalTime.now());
+        }
         Analytics analytics = new Analytics();
-        if (userID == null) {
+        if (userID == null || userID.isEmpty()) {
             String error = "Please provide User ID";
             analytics.setErrorMessage(error);
             analytics.setCreatedAt(new Date());
@@ -39,7 +46,7 @@ public class DeveloperAnalyticsDashboardService {
             analyticsRepository.save(analytics);
             return error;
         }
-        String response = "hello world";
+        String response = "Hello World!";
         analytics.setCreatedAt(new Date());
         analytics.setUserID(userID);
         analytics.setRequest(userID);
@@ -51,38 +58,45 @@ public class DeveloperAnalyticsDashboardService {
 
     public AnalyticsResponse getStats(Pageable pageable, LocalDate sDate, LocalDate eDate) {
         Page<Analytics> analytics;
-        LocalDateTime startDate = sDate.atStartOfDay();
-        LocalDateTime endDate = eDate.atTime(23, 59, 59, 999999999);
-        if (endDate != null && startDate == null) {
+        AnalyticsResponse response = new AnalyticsResponse();
+        if (eDate != null && sDate == null) {
+            LocalDateTime endDate = eDate.atTime(23, 59, 59, 999999999);
             analytics = analyticsRepository.findByCreatedAtBefore(endDate, pageable);
-        } else if (startDate != null && endDate != null) {
+            response.setTotalResults(analyticsRepository.countCreatedBefore(endDate));
+            response.setUniqueUsers(analyticsRepository.countDistinctUserBefore(endDate));
+            response.setTotalFailures(analyticsRepository.countFailureRecordsBefore(endDate));
+        } else if (sDate != null && eDate != null) {
+            LocalDateTime startDate = sDate.atStartOfDay();
+            LocalDateTime endDate = eDate.atTime(23, 59, 59, 999999999);
             analytics = analyticsRepository.findByCreatedAtBetween(startDate, endDate, pageable);
-        } else if (startDate != null) {
-            LocalDateTime now = LocalDateTime.now();
-            analytics = analyticsRepository.findByCreatedAtBetween(startDate, now, pageable);
+            response.setTotalResults(analyticsRepository.countCreatedAtBetween(startDate, endDate));
+            response.setUniqueUsers(analyticsRepository.countDistinctUserIdsBetween(startDate, endDate));
+            response.setTotalFailures(analyticsRepository.countFailureRecordsBetweenDates(startDate, endDate));
+        } else if (sDate != null && eDate == null) {
+            LocalDateTime startDate = sDate.atStartOfDay();
+            LocalDateTime endDate = LocalDateTime.now();
+            analytics = analyticsRepository.findByCreatedAtBetween(startDate, endDate, pageable);
+            response.setTotalResults(analyticsRepository.countCreatedAtBetween(startDate, endDate));
+            response.setUniqueUsers(analyticsRepository.countDistinctUserIdsBetween(startDate, endDate));
+            response.setTotalFailures(analyticsRepository.countFailureRecordsBetweenDates(startDate, endDate));
         } else {
             analytics = analyticsRepository.findAll(pageable);
+            response.setTotalResults(analyticsRepository.count());
+            response.setUniqueUsers(analyticsRepository.countDistinctUserIds());
+            response.setTotalFailures(analyticsRepository.countFailureRecords());
         }
         List<AnalyticsDTO> analyticsDTO = new ArrayList<>();
-        long totalFailures = 0;
         for (Analytics item : analytics) {
             AnalyticsDTO dto = new AnalyticsDTO();
             dto.setCreatedAt(item.getCreatedAt());
             dto.setErrorMessage(item.getErrorMessage());
             dto.setRequest(item.getRequest());
-            if (!item.getStatus().equals("Failure")) {
-                totalFailures++;
-            }
             dto.setStatus(item.getStatus());
             dto.setResponse(item.getResponse());
             dto.setUserID(item.getUserID());
             analyticsDTO.add(dto);
         }
-        AnalyticsResponse response = new AnalyticsResponse();
         response.setAnalyticsDTOList(analyticsDTO);
-        response.setTotalResults(analyticsRepository.countCreatedAtBetween(startDate, endDate));
-        response.setUniqueUsers(analyticsRepository.countDistinctUserIdsBetween(startDate, endDate));
-        response.setTotalFailures(totalFailures);
         response.setPageNumber(analytics.getNumber());
         response.setPageSize(analytics.getSize());
         response.setTotalPages(analytics.getTotalPages());
@@ -96,14 +110,14 @@ public class DeveloperAnalyticsDashboardService {
         List<DateRange> result = divideDateRange(startDate, endDate);
 
         List<String> labels = getLabels(result);
-        List<Long> uniqueUsers = new ArrayList<>();
-        List<Long> totalNumberOfCalls = new ArrayList<>();
-        List<Long> totalNumberOfFailures = new ArrayList<>();
+        List<Integer> uniqueUsers = new ArrayList<>();
+        List<Integer> totalNumberOfCalls = new ArrayList<>();
+        List<Integer> totalNumberOfFailures = new ArrayList<>();
 
         for (DateRange subRange : result) {
-            long uniqueUsersInRange = analyticsRepository.countDistinctUserIdsBetween(subRange.start, subRange.end);
-            long totalNumberOfCallsInRange = analyticsRepository.countCreatedAtBetween(subRange.start, subRange.end);
-            long totalNumberOfFailuresInRange = analyticsRepository.countFailureRecordsBetweenDates(subRange.start, subRange.end);
+            int uniqueUsersInRange = analyticsRepository.countDistinctUserIdsBetween(subRange.start, subRange.end);
+            int totalNumberOfCallsInRange = analyticsRepository.countCreatedAtBetween(subRange.start, subRange.end);
+            int totalNumberOfFailuresInRange = analyticsRepository.countFailureRecordsBetweenDates(subRange.start, subRange.end);
             uniqueUsers.add(uniqueUsersInRange);
             totalNumberOfCalls.add(totalNumberOfCallsInRange);
             totalNumberOfFailures.add(totalNumberOfFailuresInRange);
@@ -129,7 +143,7 @@ public class DeveloperAnalyticsDashboardService {
 
         if (duration.compareTo(veryShortRangeThreshold) < 0) {
             // If range is very short (< 48 hours), divide into hourly sub-ranges
-            long totalSubRanges = 10; // Maximum of 10 sub-ranges
+            Integer totalSubRanges = 10; // Maximum of 10 sub-ranges
             Duration subRangeDuration = duration.dividedBy(totalSubRanges); // Duration for each sub-range
 
             for (int i = 0; i < totalSubRanges; i++) {

@@ -4,36 +4,36 @@ import java.util.List;
 
 public class AnalyticsCountResponse {
 
-    private List<Long> uniqueUsers;
+    private List<Integer> uniqueUsers;
 
-    private List<Long> totalNumberOfCalls;
+    private List<Integer> totalNumberOfCalls;
 
-    private List<Long> totalNumberOfFailures;
+    private List<Integer> totalNumberOfFailures;
 
     private List<String> chartLabels;
 
 
-    public List<Long> getUniqueUsers() {
+    public List<Integer> getUniqueUsers() {
         return uniqueUsers;
     }
 
-    public void setUniqueUsers(List<Long> uniqueUsers) {
+    public void setUniqueUsers(List<Integer> uniqueUsers) {
         this.uniqueUsers = uniqueUsers;
     }
 
-    public List<Long> getTotalNumberOfCalls() {
+    public List<Integer> getTotalNumberOfCalls() {
         return totalNumberOfCalls;
     }
 
-    public void setTotalNumberOfCalls(List<Long> totalNumberOfCalls) {
+    public void setTotalNumberOfCalls(List<Integer> totalNumberOfCalls) {
         this.totalNumberOfCalls = totalNumberOfCalls;
     }
 
-    public List<Long> getTotalNumberOfFailures() {
+    public List<Integer> getTotalNumberOfFailures() {
         return totalNumberOfFailures;
     }
 
-    public void setTotalNumberOfFailures(List<Long> totalNumberOfFailures) {
+    public void setTotalNumberOfFailures(List<Integer> totalNumberOfFailures) {
         this.totalNumberOfFailures = totalNumberOfFailures;
     }
 

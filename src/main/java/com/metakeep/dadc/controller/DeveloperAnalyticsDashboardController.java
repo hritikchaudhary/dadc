@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,13 +22,13 @@ public class DeveloperAnalyticsDashboardController {
         this.developerAnalyticsDashboardService = developerAnalyticsDashboardService;
     }
 
-    @GetMapping("/hello")
-    public ResponseEntity<String> hello(String userID) {
-        if (userID == null) {
-            this.developerAnalyticsDashboardService.helloService(userID);
+    @PostMapping("/hello")
+    public ResponseEntity<String> hello(@RequestParam(required = false) String userID, @RequestParam(required = false) LocalDate createdAt) {
+        if (userID == null || userID.isEmpty()) {
+            this.developerAnalyticsDashboardService.helloService(userID, createdAt);
             return ResponseEntity.badRequest().body("Please provide User ID");
         }
-        String response = this.developerAnalyticsDashboardService.helloService(userID);
+        String response = this.developerAnalyticsDashboardService.helloService(userID, createdAt);
         return ResponseEntity.ok(response);
     }
 
@@ -42,8 +43,8 @@ public class DeveloperAnalyticsDashboardController {
     }
 
     @GetMapping("/statsByDate")
-    public AnalyticsCountResponse getStats(@RequestParam(required = false) LocalDate startDate,
-                                           @RequestParam(required = false) LocalDate endDate) {
+    public AnalyticsCountResponse getStats(@RequestParam(required = true) LocalDate startDate,
+                                           @RequestParam(required = true) LocalDate endDate) {
         return this.developerAnalyticsDashboardService.getStatsByDate(startDate, endDate);
     }
 }
