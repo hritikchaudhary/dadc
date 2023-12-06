@@ -18,11 +18,22 @@
     </changeSet>
 
     <changeSet id="add-analytics-sequence" author="Hritik Chaudhary">
-        <createSequence sequenceName="analytics_id_seq" startValue="300"/>
+        <createSequence sequenceName="analytics_id_seq" startValue="1000"/>
     </changeSet>
 
     <changeSet id="set-default-for-id" author="Hritik Chaudhary">
         <addDefaultValue tableName="analytics" columnName="id" defaultValueComputed="nextval('analytics_id_seq')"/>
+    </changeSet>
+
+    <changeSet id="add_indexes_to_analytics_table" author="Hritik Chaudhary">
+        <createIndex tableName="analytics" indexName="idx_timestamp">
+            <column name="timestamp"/>
+        </createIndex>
+
+        <createIndex tableName="analytics" indexName="idx_status_timestamp">
+            <column name="status"/>
+            <column name="timestamp"/>
+        </createIndex>
     </changeSet>
 
 
