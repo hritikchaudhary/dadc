@@ -4,6 +4,11 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd">
 
     <changeSet id="create-analytics-table" author="Hritik Chaudhary">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="analytics"/>
+            </not>
+        </preConditions>
         <createTable tableName="analytics">
             <column name="timestamp" type="TIMESTAMP"/>
             <column name="user_id" type="VARCHAR(255)"/>
@@ -18,14 +23,22 @@
     </changeSet>
 
     <changeSet id="add-analytics-sequence" author="Hritik Chaudhary">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="analytics_id_seq"/>
+            </not>
+        </preConditions>
         <createSequence sequenceName="analytics_id_seq" startValue="1000"/>
-    </changeSet>
-
-    <changeSet id="set-default-for-id" author="Hritik Chaudhary">
         <addDefaultValue tableName="analytics" columnName="id" defaultValueComputed="nextval('analytics_id_seq')"/>
     </changeSet>
 
     <changeSet id="add_indexes_to_analytics_table" author="Hritik Chaudhary">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="idx_timestamp"/>
+                <indexExists indexName="idx_status_timestamp"/>
+            </not>
+        </preConditions>
         <createIndex tableName="analytics" indexName="idx_timestamp">
             <column name="timestamp"/>
         </createIndex>
