@@ -37,4 +37,7 @@ public interface AnalyticsRepository extends CrudRepository<Analytics, String>, 
 
     @Query("SELECT COUNT(a) FROM Analytics a WHERE a.status = 'Failure'")
     int countFailureRecords();
+
+    @Query("SELECT COUNT(a) FROM Analytics a WHERE a.createdAt >= :startOfDay AND a.createdAt <= :endOfDay")
+    int countRecordsForDate(LocalDateTime startOfDay, LocalDateTime endOfDay);
 }

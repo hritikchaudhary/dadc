@@ -26,8 +26,11 @@ public class DeveloperAnalyticsDashboardController {
     @PostMapping("/hello")
     public ResponseEntity<String> hello(@RequestParam(required = false) String userID, @RequestParam(required = false) LocalDate createdAt) {
         if (userID == null || userID.isEmpty()) {
-            this.developerAnalyticsDashboardService.helloService(userID, createdAt);
-            return ResponseEntity.badRequest().body("Please provide User ID");
+            String response = this.developerAnalyticsDashboardService.helloService(userID, createdAt);
+            if (response.contains("API limit of 30 reached for")) {
+                return ResponseEntity.status(429).body(response);
+            }
+            return ResponseEntity.badRequest().body(response);
         }
         String response = this.developerAnalyticsDashboardService.helloService(userID, createdAt);
         return ResponseEntity.ok(response);

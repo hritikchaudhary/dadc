@@ -28,7 +28,20 @@ public class DeveloperAnalyticsDashboardService {
         this.analyticsRepository = analyticsRepository;
     }
 
+    public boolean hasReachedAPILimit(LocalDate creatDate) {
+        if (creatDate == null) {
+            creatDate = LocalDate.now();
+        }
+        LocalDateTime startOfDay = creatDate.atStartOfDay();
+        LocalDateTime endOfDay = creatDate.atTime(23, 59, 59, 999999999);
+        int apiCallsToday = analyticsRepository.countRecordsForDate(startOfDay, endOfDay);
+        return apiCallsToday >= 30;
+    }
+
     public String helloService(String userID, LocalDate createdAt) {
+        if (hasReachedAPILimit(createdAt)) {
+            return "API limit of 30 reached for: " + createdAt;
+        }
         LocalDateTime creatDate;
         if (createdAt == null) {
             creatDate = LocalDateTime.now();
